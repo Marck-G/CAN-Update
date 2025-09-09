@@ -1,0 +1,77 @@
+\section{Marco Teórico}
+
+En esta sección se presentan los fundamentos técnicos y conceptuales que sustentan el desarrollo del presente proyecto. Se abordan tecnologías clave del sector automotriz, enfocadas principalmente en la comunicación interna entre sistemas electrónicos.
+
+\subsection{Protocolo CAN BUS}
+
+El \textbf{Controller Area Network} (CAN BUS) es un protocolo de comunicación serial creado por Bosch en los años 80, diseñado para aplicaciones en la automoción y estandarizado posteriormente en la norma ISO 11898 \cite{iso11898}. Su característica esencial es permitir que múltiples microcontroladores y dispositivos (nodos) se comuniquen entre sí sin necesidad de un maestro central.\\
+
+La robustez del protocolo se debe a su esquema de arbitraje: cuando dos nodos transmiten al mismo tiempo, prevalece el mensaje con identificador de menor valor, lo que asegura una comunicación determinista y priorizada. Además, utiliza comunicación diferencial mediante dos líneas (CAN\_H y CAN\_L), alcanzando velocidades típicas de hasta 1 Mbps.\\
+
+El bus CAN utiliza un protocolo \textbf{basado en mensajes}, donde los datos se transmiten en tramas en lugar de conexiones punto a punto. 
+
+Cada trama de mensaje CAN consta de varios campos: el \textbf{Inicio de Trama} (SOF), un Identificador (ID), Campo de Control, Campo de Datos, \textbf{Verificación por Redundancia Cíclica} (CRC), Campo de Reconocimiento (ACK) y el Fin de Trama (EOF). El Identificador es crucial, ya que determina la prioridad del mensaje; los valores numéricos más bajos tienen mayor prioridad. Esto permite que los mensajes críticos, como los relacionados con el frenado o el control del motor, se transmitan antes que datos menos urgentes. \\
+
+El protocolo CAN utiliza un mecanismo de Acceso Múltiple por \textbf{Detección de Portadora con Detección de Colisiones} (CSMA/CD), pero con un proceso de arbitraje único. Cuando varios nodos intentan transmitir al mismo tiempo, el nodo con el ID más bajo gana la arbitraje y continúa transmitiendo, mientras que los demás se retiran automáticamente, lo que garantiza que no se pierda ningún dato.\\
+
+\subsubsection{Tramas}
+El bus Controller Area Network (CAN) utiliza una estructura específica de tramas de mensajes para la transmisión de datos, lo que garantiza una comunicación eficiente y confiable entre las unidades de control electrónico (ECUs) en entornos como los sistemas automotrices e industriales.
+El protocolo CAN define varios tipos de tramas: \textbf{tramas de datos, tramas remotas, tramas de error y tramas de sobrecarga}, cada una con una función específica.\\
+\subsubsection*{Trama de datos}
+Una trama de datos se utiliza para transmitir información desde un nodo a uno o más nodos receptores y consta de varios campos.
+Comienza con el Inicio de Trama (\textbf{SOF}), un solo bit dominante (lógica 0) que señala el comienzo de un nuevo mensaje y sincroniza todos los nodos en el bus.
+Después del SOF, sigue el \textbf{Campo de Arbitraje}, que contiene el ID del mensaje (11 bits en formato estándar, permitiendo 2048 identificadores únicos) y el bit \textbf{Remote Transmission Request (RTR)}.
+El bit RTR distingue entre una trama de datos (RTR = 0) y una trama remota (RTR = 1).
+El ID del mensaje también determina la prioridad del mensaje durante la arbitraje del bus; \textbf{un ID numéricamente más bajo tiene mayor prioridad.}\\
+
+A continuación se encuentra el Campo de Control, que incluye bits reservados (R0, R1) y el \textbf{Código de Longitud de Datos (DLC)}, un campo de 4 bits que indica la cantidad de bytes de datos (de 0 a 8) en la trama.
+Le sigue el Campo de Datos, que contiene la carga útil del mensaje, con un máximo de 8 bytes en el CAN estándar.
+Después de los datos, un campo de \textbf{Verificación por Redundancia Cíclica (CRC)} de 15 bits garantiza la detección de errores; el receptor calcula su propio CRC y lo compara con el valor transmitido.
+Una discrepancia indica un error de transmisión.\\
+
+El \textbf{Campo de Reconocimiento (ACK)} consta de una ranura ACK y un delimitador ACK.
+El nodo transmisor envía un bit recesivo en la ranura ACK, que los nodos receptores sobrescriben con un bit dominante (lógica 0) para confirmar la recepción exitosa; si esto no ocurre, se produce un error de ACK.
+La trama concluye con el \textbf{ Fin de Trama (EOF)}, siete bits recesivos que marcan el final de la trama, seguidos por un espacio de Intermisión (IFS) de 3 bits, tras lo cual el bus vuelve al estado inactivo y cualquier nodo puede iniciar una nueva transmisión.\\
+\subsubsection*{Tramas remotas}
+Las tramas remotas son estructuralmente similares a las tramas de datos, pero carecen del campo de datos; se utilizan para que un nodo solicite datos a otro nodo, que luego responde con una trama de datos usando el mismo ID de mensaje.
+
+\subsubsection*{Tramas de error}
+Las tramas de error son transmitidas por cualquier nodo que detecta un error y sirven para abortar la trama actual, mientras que las tramas de sobrecarga introducen una demora entre tramas para gestionar la carga de procesamiento de los nodos.\\
+
+
+\subsection{Unidades de Control Electrónico (ECUs)}
+
+Las ECUs son microcontroladores dedicados al control de funciones específicas dentro del vehículo, como el motor, la transmisión, los frenos, la climatización o el sistema de infoentretenimiento. Cada ECU intercambia información con otras a través del bus CAN, conformando una arquitectura de red interna. \\
+
+En automóviles modernos, el número de ECUs puede superar las 50 unidades, reflejando la creciente complejidad electrónica. En contraste, en vehículos más antiguos las funciones electrónicas eran más aisladas y, en muchos casos, limitadas al diagnóstico del motor.
+
+\subsection{El protocolo ISP}
+
+\subsection{El protocolo $I^2C$}
+
+\subsection{El protocolo USART}
+
+
+\subsection{El MCP2515 como controlador CAN}
+
+Para integrar nodos CAN en sistemas embebidos que no cuentan con este protocolo de manera nativa, se emplean controladores externos como el \textbf{MCP2515}, fabricado por Microchip Technology. Este chip, conectado mediante interfaz SPI, implementa el protocolo CAN 2.0B y facilita la transmisión y recepción de mensajes.\\
+
+Entre sus características destacan la capacidad de trabajar a 1 Mbps, tres buffers de transmisión y dos de recepción, así como filtros y máscaras programables que permiten gestionar eficientemente el tráfico en el bus. En este proyecto, el MCP2515 actúa como intermediario entre los microcontroladores y el bus CAN, garantizando escalabilidad y compatibilidad con estándares de la industria.
+
+\subsection{Microcontroladores y plataformas embebidas utilizadas}
+
+El proyecto contempla el uso de microcontroladores \textbf{Atmega} (como los empleados en placas Arduino) para funciones de control en tiempo real y bajo consumo, en conjunto con plataformas más potentes como \textbf{Raspberry Pi} para la gestión multimedia y de conectividad.\\
+
+Los Atmega destacan por su sencillez y amplia documentación, mientras que las Raspberry Pi permiten manejar interfaces gráficas, procesamiento de audio y comunicación con redes externas. Esta combinación asegura una arquitectura balanceada entre nodos ligeros y nodos avanzados.
+
+\subsection{Arquitectura distribuida en automoción}
+
+La arquitectura distribuida en vehículos implica que cada función relevante es gestionada por una ECU especializada, todas interconectadas por un bus común. Este enfoque modular mejora la escalabilidad, la tolerancia a fallos y la posibilidad de añadir nuevas funciones sin rediseñar completamente el sistema.\\
+
+Nuestro proyecto se inspira en este principio para añadir dos nuevas unidades: una de confort y otra de multimedia, que se integrarán al bus CAN extendiendo las capacidades del vehículo base.
+
+\subsection{Diagnóstico mediante OBD-II}
+
+El \textbf{On-Board Diagnostics II} (OBD-II) es un estándar internacional (SAE J1962) que permite acceder a datos de diagnóstico del motor y emisiones. Aunque puede emplear diferentes protocolos (ISO 9141, KWP2000, J1850), desde 2008 la normativa exige que todos los vehículos ligeros vendidos en Estados Unidos soporten comunicación CAN en este conector.\\
+
+En el caso del vehículo de estudio, la única comunicación CAN existente se limita al OBD-II para diagnóstico. Por ello, uno de los objetivos principales del proyecto es extender la red interna para habilitar un bus CAN activo y bidireccional, capaz de integrar nuevas ECUs con funcionalidades ampliadas.

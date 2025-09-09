@@ -1,0 +1,19 @@
+\section{Introducción}
+
+La evolución de los sistemas electrónicos en el sector de la automoción ha permitido que los vehículos modernos cuenten con redes de comunicación internas avanzadas, como el protocolo \textit{CAN BUS}, que interconectan múltiples unidades de control electrónico (ECUs) para funciones de confort, seguridad, motorización y multimedia. Sin embargo, muchos vehículos fabricados en décadas anteriores carecen de estas capacidades, lo que limita significativamente su nivel de automatización y conectividad.\\
+
+Este proyecto surge con el objetivo de transformar un vehículo antiguo —equipado originalmente únicamente con una unidad de control de motor conectada a través del conector OBD para diagnóstico— en una plataforma más avanzada, dotada de nuevas funcionalidades que permitan ampliar su experiencia de uso y control interno.\\
+
+Para ello, se propone la integración de un sistema de automatización distribuido basado en el protocolo \textit{CAN BUS}, empleando controladores diseñados por el propio equipo de desarrollo. Estos controladores estarán basados en el chip \textbf{MCP2515}, un controlador CAN SPI ampliamente utilizado, que permitirá establecer nodos adicionales dentro de la red del vehículo.\\
+
+El proyecto contempla la creación de al menos dos nuevas unidades funcionales:
+
+\begin{itemize}
+  \item \textbf{Unidad de confort:} encargada de funciones como el control de climatización, cierre centralizado, control de ventanas y posibles ajustes de iluminación interior.
+  \item \textbf{Unidad multimedia:} enfocada en la gestión de audio, interfaces con el usuario, conectividad y notificaciones del sistema.
+\end{itemize}
+
+Estas unidades estarán interconectadas mediante un nuevo bus CAN estructurado, que permitirá comunicación en tiempo real y expansión futura. El sistema será desarrollado, probado e integrado completamente por el equipo, aprovechando tanto hardware propio como soluciones abiertas adaptadas al entorno del vehículo.\\
+
+Con esta iniciativa se busca no solo modernizar un automóvil existente, sino también explorar las posibilidades de extender tecnologías de automoción a plataformas donde originalmente no estaban concebidas, lo cual abre nuevas puertas para la actualización tecnológica de flotas antiguas o proyectos de restauración inteligente.
+

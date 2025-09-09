@@ -1,0 +1,73 @@
+\section{Metodología}
+
+La metodología adoptada para el desarrollo del proyecto se estructura en fases progresivas que abarcan desde la investigación inicial hasta la validación experimental del sistema. Cada etapa contempla actividades específicas, herramientas y criterios de evaluación, con el fin de garantizar un proceso de diseño integral, replicable y orientado a resultados.
+
+\subsection{Fase 1: Análisis inicial}
+
+En esta etapa se llevará a cabo la revisión detallada del vehículo base, incluyendo:
+
+\begin{itemize}
+    \item Inspección del cableado eléctrico existente.
+    \item Identificación de las ECUs presentes y sus funciones.
+    \item Exploración del conector OBD-II y sus protocolos soportados.
+\end{itemize}
+
+El objetivo de esta fase es obtener un diagnóstico general de las capacidades electrónicas del vehículo, sirviendo como base para el diseño de la red CAN extendida.
+
+\subsection{Fase 2: Diseño del sistema}
+
+Se propondrá la arquitectura de red CAN distribuida a implementar. Las decisiones de diseño incluyen:
+
+\begin{itemize}
+    \item Empleo de \textbf{Raspberry Pi} como unidades de control principales (ECUs de confort y multimedia).
+    \item Uso de microcontroladores \textbf{Atmega} como nodos secundarios conectados al bus CAN, para la interpretación de mensajes y control de actuadores.
+    \item Definición de sensores y actuadores a integrar (sensores de temperatura, humedad, presión, relés para ventanas, controles de audio).
+\end{itemize}
+
+El resultado esperado de esta fase es un diagrama de bloques de la red CAN propuesta, detallando la distribución de funciones en cada unidad.
+
+\subsection{Fase 3: Desarrollo de hardware}
+
+Durante esta etapa se desarrollará el hardware requerido, iniciando con módulos comerciales para pruebas y avanzando hacia un diseño de placas personalizadas con el chip \textbf{MCP2515}. Las actividades incluyen:
+
+\begin{itemize}
+    \item Montaje de nodos de prueba basados en Arduino + MCP2515.
+    \item Prototipado de la ECU de confort y la ECU multimedia en Raspberry Pi.
+    \item Diseño de una PCB personalizada para la versión final del sistema.
+\end{itemize}
+
+\subsection{Fase 4: Desarrollo de software}
+
+El software se desarrollará empleando el lenguaje \textbf{Rust} en todas las plataformas involucradas, lo que asegura consistencia y eficiencia. Se plantea la siguiente distribución:
+
+\begin{itemize}
+    \item \textbf{Nodos (Atmega):} programación en Rust para control de sensores y actuadores, con interpretación de mensajes CAN.
+    \item \textbf{ECUs (Raspberry Pi):} aplicaciones en Rust y \texttt{Tauri} para gestión de interfaces, comunicación con la aplicación móvil y servicios inteligentes.
+    \item \textbf{Aplicación móvil:} desarrollo en Rust o \texttt{React Native}, con conectividad vía Bluetooth. Inicialmente será compatible con Android y posteriormente con iOS.
+    \item \textbf{Control por voz:} integración de librerías locales de reconocimiento de voz (ej. Vosk, PocketSphinx) que permitan ejecutar comandos sin necesidad de servicios en la nube.
+\end{itemize}
+
+\subsection{Fase 5: Integración con aplicación móvil}
+
+Se desarrollará una aplicación móvil que permita interactuar con el sistema a través de Bluetooth. Entre sus funciones principales estarán:
+
+\begin{itemize}
+    \item Monitoreo de sensores (temperatura, humedad, presión).
+    \item Control remoto de ventanas, climatización y funciones de confort.
+    \item Gestión de audio y multimedia.
+    \item Ejecución de comandos mediante voz, con procesamiento local en la ECU multimedia.
+\end{itemize}
+
+\subsection{Fase 6: Validación experimental}
+
+La validación se realizará de manera incremental, iniciando con pruebas en banco y posteriormente en el vehículo. Las pruebas incluyen:
+
+\begin{itemize}
+    \item Comunicación CAN entre nodos de prueba.
+    \item Integración de ECUs con sensores y actuadores en entorno controlado.
+    \item Pruebas de conectividad con la aplicación móvil vía Bluetooth.
+    \item Validación del control por voz en condiciones reales dentro del vehículo.
+\end{itemize}
+
+Los resultados de cada prueba se documentarán en una \textbf{bitácora de experimentos}, lo que permitirá identificar fallos, corregir iterativamente el diseño y asegurar la replicabilidad del sistema.
+

@@ -1,0 +1,51 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[spanish]{babel}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{fontspec}
+\usepackage{hyperref}
+\usepackage{pdfpages}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{geometry}
+\usepackage{longtable}
+\usepackage{setspace} 
+\usepackage{biblatex}
+\usepackage{titlesec}
+% \addbibresource{bibliography/referencias.bib}
+
+
+\setmainfont{Times New Roman}
+\setsansfont{SF Pro Display}
+\newfontfamily{\nasa}{Nasalization}
+\newfontfamily{\ptitle}{Perpetua Titling MT}
+\newfontfamily{\perpetua}{Perpetua}
+
+
+\title{Documentación del Proyecto de Ingeniería}
+\author{Equipo de Investigación}
+\date{\today}
+
+\begin{document}
+
+\input{sections/portada.tex}
+\tableofcontents
+\newpage
+\doublespacing
+
+\input{sections/introduccion.tex}
+\input{sections/marco_teorico.tex}
+\input{sections/objetivos.tex}
+\input{sections/metodologia.tex}
+\input{sections/diseno.tex}
+% \input{sections/result_experi.tex}
+\input{sections/bitacora.tex}
+
+
+\newpage
+% \input{annexes/index_anexos.tex}
+
+% \printbibliography
+
+\end{document}
