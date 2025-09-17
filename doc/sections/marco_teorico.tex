@@ -45,11 +45,124 @@ Las ECUs son microcontroladores dedicados al control de funciones específicas d
 
 En automóviles modernos, el número de ECUs puede superar las 50 unidades, reflejando la creciente complejidad electrónica. En contraste, en vehículos más antiguos las funciones electrónicas eran más aisladas y, en muchos casos, limitadas al diagnóstico del motor.
 
-\subsection{El protocolo ISP}
+\subsection{El protocolo ISP (In-System Programming)}
+El \textbf{ISP} (\textit{In-System Programming}) es un protocolo de programación que permite cargar firmware en microcontroladores directamente en la placa donde se encuentran montados, sin necesidad de retirarlos o emplear programadores externos especializados. Este enfoque resulta fundamental en el desarrollo de sistemas embebidos, ya que facilita la iteración rápida, la actualización de software y el mantenimiento de los dispositivos una vez desplegados en el entorno de aplicación.
 
-\subsection{El protocolo $I^2C$}
+El principio básico de ISP consiste en habilitar al microcontrolador para que, mediante una interfaz de comunicación serial dedicada, reciba instrucciones de programación desde un dispositivo externo (generalmente un computador o un programador USB) y almacene el código binario en su memoria flash. Para ello, el microcontrolador dispone de un \textbf{bootloader} o de rutinas internas específicas que gestionan este proceso.
 
-\subsection{El protocolo USART}
+\subsubsection*{Características principales}
+
+\begin{itemize}
+    \item \textbf{Acceso directo a la memoria:} permite escribir y reescribir el contenido de la memoria de programa sin desmontar el microcontrolador.
+    \item \textbf{Uso de pines estándar:} típicamente se emplean líneas como MOSI, MISO, SCK y RESET, compartidas con la interfaz SPI del dispositivo.
+    \item \textbf{Compatibilidad amplia:} la mayoría de los microcontroladores de las familias \textbf{Atmel AVR}, \textbf{PIC} y algunos ARM Cortex incluyen soporte para ISP.
+    \item \textbf{Velocidad de programación:} el proceso es relativamente rápido debido a la naturaleza serial síncrona de la comunicación.
+\end{itemize}
+
+\subsubsection*{Aplicaciones en el proyecto}
+
+En el contexto del presente trabajo, el protocolo ISP será utilizado para programar los microcontroladores \textbf{Atmega} que actúan como nodos en la red CAN. Estos microcontroladores, equipados con el chip MCP2515 para conectividad, requieren que su firmware se cargue y actualice durante el ciclo de desarrollo y pruebas. La posibilidad de reprogramarlos en la propia tarjeta sin desoldar ni extraer componentes representa una ventaja significativa en términos de agilidad y reducción de costos.
+
+Asimismo, el uso de ISP permite realizar ajustes incrementales en los algoritmos de interpretación de mensajes CAN, control de sensores o activación de actuadores, garantizando un flujo de desarrollo iterativo y flexible. Esta capacidad resulta clave en proyectos de I+D donde la experimentación y la mejora continua son parte inherente del proceso.
+
+\subsection{Protocolo SPI (Serial Peripheral Interface)}
+
+El \textbf{SPI} (\textit{Serial Peripheral Interface}) es un protocolo de comunicación serial síncrono desarrollado por Motorola a mediados de los años 80, ampliamente utilizado en sistemas embebidos para la interconexión de microcontroladores con periféricos de alta velocidad, tales como memorias, sensores, convertidores A/D y controladores de comunicación como el \textbf{MCP2515} utilizado en este proyecto. Su diseño prioriza la \textbf{velocidad y simplicidad}, lo que lo convierte en una de las interfaces más empleadas en aplicaciones que requieren intercambio rápido y confiable de datos.
+
+\subsubsection*{Principios de funcionamiento}
+
+El protocolo SPI se basa en un esquema \textbf{maestro–esclavo}, donde un dispositivo maestro controla el flujo de comunicación mediante una señal de reloj compartida. Para ello, utiliza cuatro líneas principales:
+
+\begin{itemize}
+    \item \textbf{MOSI (Master Out, Slave In)}: línea de datos desde el maestro hacia el esclavo.
+    \item \textbf{MISO (Master In, Slave Out)}: línea de datos desde el esclavo hacia el maestro.
+    \item \textbf{SCK (Serial Clock)}: señal de reloj generada por el maestro para sincronizar la transferencia.
+    \item \textbf{SS (Slave Select)}: señal para habilitar o deshabilitar un esclavo específico en el bus.
+\end{itemize}
+
+La transferencia de datos se realiza de forma \textbf{full-duplex}, lo que significa que mientras el maestro envía un bit por MOSI, simultáneamente recibe otro desde MISO. Esto permite velocidades de comunicación superiores a las de protocolos como I\textsuperscript{2}C o UART.
+
+\subsubsection*{Características principales}
+
+\begin{itemize}
+    \item \textbf{Alta velocidad de transferencia:} puede alcanzar decenas de MHz en implementaciones típicas.
+    \item \textbf{Simplicidad de protocolo:} no requiere direccionamiento complejo ni tramas extensas.
+    \item \textbf{Full-duplex:} permite transmisión y recepción simultánea de datos.
+    \item \textbf{Flexibilidad en configuración:} parámetros como polaridad y fase del reloj (CPOL y CPHA) pueden ajustarse para adaptarse a distintos periféricos.
+    \item \textbf{Limitación en número de esclavos:} cada dispositivo requiere su propia línea de selección (SS), lo que dificulta la escalabilidad en sistemas con muchos periféricos.
+\end{itemize}
+
+\subsubsection*{Aplicaciones en el proyecto}
+
+En el presente proyecto, el protocolo SPI se emplea como interfaz de comunicación entre los microcontroladores \textbf{Atmega} y el controlador CAN \textbf{MCP2515}. Gracias a la velocidad de SPI, es posible enviar y recibir tramas CAN de forma eficiente, asegurando que los nodos diseñados puedan integrarse correctamente en la red del vehículo.
+
+Además, el uso de SPI permite que los microcontroladores intercambien información con otros periféricos de apoyo, como memorias externas o sensores de alta velocidad, en caso de ser necesario. De esta forma, SPI actúa como un \textbf{puente fundamental} entre la lógica de los microcontroladores y el hardware de comunicación que conecta al vehículo con la red CAN distribuida.
+
+\subsection{Protocolo I\textsuperscript{2}C (Inter-Integrated Circuit)}
+El protocolo \textbf{I\textsuperscript{2}C} (\textit{Inter-Integrated Circuit}) es un estándar de comunicación serial desarrollado por Philips a principios de los años 80, diseñado para permitir la interconexión sencilla de múltiples dispositivos electrónicos empleando únicamente dos líneas de comunicación: \textbf{SDA} (Serial Data) y \textbf{SCL} (Serial Clock). Su filosofía se centra en la simplicidad de conexión, bajo consumo de pines y capacidad de escalar a configuraciones maestro-esclavo en sistemas embebidos.
+
+\subsubsection*{Principios de funcionamiento}
+
+El bus I\textsuperscript{2}C permite que un \textbf{dispositivo maestro} controle la comunicación, generando las señales de reloj (SCL) y enviando las instrucciones a uno o más \textbf{dispositivos esclavos}. Cada esclavo conectado al bus dispone de una dirección única, lo que hace posible que múltiples circuitos integrados (sensores, memorias, conversores A/D, etc.) compartan las mismas líneas físicas sin interferencia. 
+
+El protocolo es síncrono y soporta velocidades de transferencia que van desde:
+\begin{itemize}
+    \item 100 kHz (modo estándar),
+    \item 400 kHz (modo rápido),
+    \item hasta varios MHz en implementaciones extendidas (Fast-mode Plus, High-speed mode).
+\end{itemize}
+
+\subsubsection*{Características principales}
+
+\begin{itemize}
+    \item \textbf{Uso eficiente de pines:} solo requiere dos líneas para interconectar múltiples dispositivos.
+    \item \textbf{Escalabilidad:} admite múltiples esclavos y, en algunas implementaciones, múltiples maestros.
+    \item \textbf{Direccionamiento:} cada esclavo posee una dirección de 7 o 10 bits, lo que posibilita la conexión de decenas de periféricos en un mismo bus.
+    \item \textbf{Comunicación half-duplex:} en la misma línea SDA se transmiten y reciben datos, bajo control del maestro.
+    \item \textbf{Soporte en hardware:} gran variedad de microcontroladores incluyen módulos I\textsuperscript{2}C dedicados.
+\end{itemize}
+
+\subsubsection*{Aplicaciones en el proyecto}
+
+En el presente proyecto, el protocolo I\textsuperscript{2}C se considera clave para la \textbf{interconexión local de sensores} dentro de cada nodo controlado por microcontroladores Atmega o Raspberry Pi. Por ejemplo, los sensores de \textbf{temperatura, humedad y presión ambiental} suelen disponer de interfaces I\textsuperscript{2}C, lo que simplifica su integración al requerir solo dos pines del microcontrolador.
+
+De este modo, mientras que el \textbf{CAN BUS} sirve como red troncal de comunicación entre las distintas ECUs del vehículo, el \textbf{I\textsuperscript{2}C} funciona como un sub-bus interno dentro de cada ECU, facilitando la conexión de múltiples periféricos sin necesidad de recurrir a buses adicionales más complejos. Esta complementariedad entre ambos protocolos asegura un diseño modular y escalable del sistema.
+\subsection{Protocolo USART (Universal Synchronous/Asynchronous Receiver-Transmitter)}
+
+El \textbf{USART} (\textit{Universal Synchronous/Asynchronous Receiver-Transmitter}) es un módulo de comunicación serial integrado en numerosos microcontroladores, cuya función es transmitir y recibir datos de manera eficiente mediante una interfaz configurable tanto en modo síncrono como en modo asíncrono. A diferencia de buses como I\textsuperscript{2}C o SPI, el USART no define un protocolo completo de interconexión, sino que proporciona una \textbf{interfaz física y lógica} para la transmisión de datos serializados entre dispositivos.
+
+\subsubsection*{Principios de funcionamiento}
+
+En su modo más común, el \textbf{asíncrono}, el USART implementa la comunicación serial UART tradicional, donde los datos se transmiten bit a bit a través de dos líneas:
+\begin{itemize}
+    \item \textbf{TX (Transmit)}: línea de transmisión de datos.
+    \item \textbf{RX (Receive)}: línea de recepción de datos.
+\end{itemize}
+
+El flujo de datos está organizado en \textbf{tramas} que incluyen bits de inicio, bits de datos, opcionalmente un bit de paridad y uno o más bits de parada. Esta estructura permite que el receptor sincronice la comunicación sin necesidad de compartir una señal de reloj, aunque ambas partes deben configurarse a la misma velocidad de transmisión (\textit{baud rate}).
+
+En el modo \textbf{síncrono}, el USART emplea además una línea de reloj compartida que asegura la sincronización exacta entre transmisor y receptor, lo que permite mayores velocidades de transferencia y una comunicación más robusta.
+
+\subsubsection*{Características principales}
+
+\begin{itemize}
+    \item \textbf{Flexibilidad:} soporta tanto transmisión síncrona como asíncrona.
+    \item \textbf{Velocidad:} puede operar en un amplio rango de tasas de transmisión, típicamente entre 300 baudios y varios Mbps.
+    \item \textbf{Eficiencia:} requiere solo dos líneas en modo asíncrono (TX y RX), y tres en modo síncrono (TX, RX y CLK).
+    \item \textbf{Compatibilidad:} base de estándares de comunicación ampliamente usados como RS-232, RS-485 y TTL serial.
+    \item \textbf{Implementación simple:} disponible de forma nativa en la mayoría de microcontroladores.
+\end{itemize}
+
+\subsubsection*{Aplicaciones en el proyecto}
+
+En este proyecto, el uso del protocolo USART se contempla principalmente para:
+\begin{itemize}
+    \item \textbf{Depuración y pruebas}: permitir la comunicación entre los microcontroladores (Atmega o Raspberry Pi) y un computador externo para monitorear mensajes, estados del bus CAN y parámetros de sensores.
+    \item \textbf{Configuración inicial}: facilitar la carga de parámetros de red o ajustes de firmware durante la fase de pruebas en banco.
+    \item \textbf{Interconexión de módulos externos}: algunos periféricos que no soportan I\textsuperscript{2}C pueden integrarse mediante interfaces UART, garantizando versatilidad en la expansión del sistema.
+\end{itemize}
+
+Gracias a su simplicidad y soporte extendido, el USART constituye una herramienta esencial en el ciclo de desarrollo, complementando al bus CAN (para comunicación distribuida en el vehículo) y a I\textsuperscript{2}C (para la integración de sensores locales en cada nodo).
 
 
 \subsection{El MCP2515 como controlador CAN}
